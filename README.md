@@ -1,0 +1,1 @@
+# Vanilla Javascript grocery list application with CRUD functionality.
