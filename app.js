@@ -127,7 +127,7 @@ function editItem(e) {
   //
   submitBtn.textContent = "edit";
 }
-// set backt to defaults
+// set back to defaults
 function setBackToDefault() {
   grocery.value = "";
   editFlag = false;
@@ -138,13 +138,25 @@ function setBackToDefault() {
 // ****** LOCAL STORAGE **********
 function addToLocalStorage(id, value) {
     const grocery = {id: id, value: value};
-    let items = localStorage.getItem("list") ?JSON.parse(localStorage.getItem('list')):[]; 
+    let items = getLocalStorage();
     items.push(grocery);
     localStorage.setItem('list', JSON.stringify(items));
-
 }
 
 function removeFromLocalStorage(id) {
-  console.log("setup function");
+  let items = getLocalStorage(); 
+
+  items = items.filter((item)=>{
+    if(item.id !==id){
+      return item
+    }
+  });
+  localStorage.setItem('list', JSON.stringify(items));
+}
+
+function editLocalStorage(id, value) {}
+
+function getLocalStorage(){
+  return localStorage.getItem("list") ?JSON.parse(localStorage.getItem('list')):[]; 
 }
 // ****** SETUP ITEMS **********
