@@ -1,26 +1,26 @@
-// ****** SELECT ITEMS **********
-const alert = document.querySelector(".alert");
+// ****** select items **********
+
 const form = document.querySelector(".grocery-form");
-// input
+const alert = document.querySelector(".alert");
 const grocery = document.getElementById("grocery");
 const submitBtn = document.querySelector(".submit-btn");
 const container = document.querySelector(".grocery-container");
 const list = document.querySelector(".grocery-list");
 const clearBtn = document.querySelector(".clear-btn");
-
 // edit option
 let editElement;
 let editFlag = false;
 let editID = "";
+// ****** event listeners **********
 
-// ****** EVENT LISTENERS **********
 // submit form
 form.addEventListener("submit", addItem);
+// clear list
+clearBtn.addEventListener("click", clearItems);
+// display items onload
+window.addEventListener("DOMContentLoaded", setupItems);
 
-// clear items
-clearBtn.addEventListener('click', clearItems);
-
-// ****** FUNCTIONS **********
+// ****** functions **********
 
 // add item
 function addItem(e) {
@@ -127,7 +127,7 @@ function editItem(e) {
   //
   submitBtn.textContent = "edit";
 }
-// set back to defaults
+// set backt to defaults
 function setBackToDefault() {
   grocery.value = "";
   editFlag = false;
@@ -135,37 +135,84 @@ function setBackToDefault() {
   submitBtn.textContent = "submit";
 }
 
-// ****** LOCAL STORAGE **********
+// ****** local storage **********
+
+// add to local storage
 function addToLocalStorage(id, value) {
-    const grocery = {id: id, value: value};
-    let items = getLocalStorage();
-    items.push(grocery);
-    localStorage.setItem('list', JSON.stringify(items));
+  const grocery = { id, value };
+  let items = getLocalStorage();
+  items.push(grocery);
+  localStorage.setItem("list", JSON.stringify(items));
+}
+
+function getLocalStorage() {
+  return localStorage.getItem("list")
+    ? JSON.parse(localStorage.getItem("list"))
+    : [];
 }
 
 function removeFromLocalStorage(id) {
-  let items = getLocalStorage(); 
+  let items = getLocalStorage();
 
-  items = items.filter((item)=>{
-    if(item.id !==id){
-      return item
+  items = items.filter(function (item) {
+    if (item.id !== id) {
+      return item;
     }
   });
-  localStorage.setItem('list', JSON.stringify(items));
-}
 
+  localStorage.setItem("list", JSON.stringify(items));
+}
 function editLocalStorage(id, value) {
   let items = getLocalStorage();
-  items  = items.map((item)=>{
-    if(item.id === id){
+
+  items = items.map(function (item) {
+    if (item.id === id) {
       item.value = value;
     }
     return item;
   });
-  localStorage.setItem('list', JSON.stringify(items));
+  localStorage.setItem("list", JSON.stringify(items));
 }
 
-function getLocalStorage(){
-  return localStorage.getItem("list") ?JSON.parse(localStorage.getItem('list')):[]; 
+// SETUP LOCALSTORAGE.REMOVEITEM('LIST');
+
+// ****** setup items **********
+
+function setupItems() {
+  let items = getLocalStorage();
+
+  if (items.length > 0) {
+    items.forEach(function (item) {
+      createListItem(item.id, item.value);
+    });
+    container.classList.add("show-container");
+  }
 }
-// ****** SETUP ITEMS **********
+
+function createListItem(id, value) {
+  const element = document.createElement("article");
+  let attr = document.createAttribute("data-id");
+  attr.value = id;
+  element.setAttributeNode(attr);
+  element.classList.add("grocery-item");
+  element.innerHTML = `<p class="title">${value}</p>
+            <div class="btn-container">
+              <!-- edit btn -->
+              <button type="button" class="edit-btn">
+                <i class="fas fa-edit"></i>
+              </button>
+              <!-- delete btn -->
+              <button type="button" class="delete-btn">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          `;
+  // add event listeners to both buttons;
+  const deleteBtn = element.querySelector(".delete-btn");
+  deleteBtn.addEventListener("click", deleteItem);
+  const editBtn = element.querySelector(".edit-btn");
+  editBtn.addEventListener("click", editItem);
+
+  // append child
+  list.appendChild(element);
+}
